@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Happy Birthday!</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+        color: white;
+        text-align: center;
+        height: 100vh;
+        background-image: url("image/c1.jpg"); /* Initial background image */
+        background-size: cover;
+        background-position: center;
+        transition: background 2s ease; /* Smooth transition for background change */
+      }
+
+      #container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #message {
+        font-size: 2.5rem; /* Adjust the size to be prominent */
+        background: rgba(0, 0, 0, 0.5); /* Subtle dark background */
+        color: #ffe082; /* Warm golden color for text */
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        line-height: 1.5; /* Adjust line spacing for readability */
+        font-weight: 600; /* Make the text slightly bold */
+        animation: fadeIn 1s ease; /* Smoothly fade in when the page loads */
+        max-width: 80%; /* Keep the text container manageable on larger screens */
+        margin: 0 auto; /* Center the text horizontally */
+      }
+
+      #revealButton {
+        position: absolute;
+        bottom: 50px;
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
+        color: white;
+        border: none;
+        padding: 20px 40px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 1.4rem;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        z-index: 10;
+      }
+
+      #revealButton:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(135deg, #ff4b2b, #ff416c);
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      #finalImage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        transition: opacity 1s ease-in-out;
+        opacity: 0;
+      }
+
+      #finalImage img {
+        max-width: 80%;
+        max-height: 80%;
+        transform: scale(0);
+        transition: transform 1.5s ease-in-out;
+      }
+
+      #finalMessage {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, 0);
+        font-size: 2.5rem;
+        color: rgb(243, 99, 99);
+        display: none;
+        opacity: 0;
+        z-index: 2;
+        transition: opacity 1s ease-in-out;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      @media (max-width: 768px) {
+        #message {
+          font-size: 3rem;
+          padding: 15px;
+        }
+
+        #revealButton {
+          font-size: 1.2rem;
+          padding: 15px 30px;
+        }
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div id="message">
+        You are the heart of my life, filling every moment with joy and warmth.
+        May your day be as special and amazing as you are to me. I’m so grateful
+        for you and excited for all the beautiful moments yet to come.
+      </div>
+      <button id="revealButton">Click to Reveal More!</button>
+      <canvas id="fireworksCanvas"></canvas>
+      <div id="finalImage">
+        <img id="finalImg" src="image/c7.MOV" alt="Happy Birthday!" />
+      </div>
+      <div id="finalMessage">Happy Birthday, my everything! 🎉❤️🎂 🎉</div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("fireworksCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const messages = [
+        "You're the best part of my life! 💖",
+        "Every moment with you is magical. ✨",
+        "You light up my world! 🌟",
+        "your presence is the most precious gift I could ever have... ❤️",
+        "You're my everything! 💕",
+      ];
+      let clickCount = 0;
+      let soundPlayed = false;
+
+      const backgrounds = [
+        "url('image/c1.jpg')",
+        "url('image/c2.jpg')",
+        "url('image/c3.jpg')",
+        "url('image/c4.jpg')",
+        "url('image/couple.jpg')",
+        "url('image/c6.jpg')",
+      ];
+      let bgIndex = 1;
+
+      class Particle {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.radius = Math.random() * 4 + 1;
+          this.color = color;
+          this.velocityX = Math.random() * 4 - 2;
+          this.velocityY = Math.random() * 4 - 2;
+          this.alpha = 1;
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.alpha;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.restore();
+        }
+
+        update() {
+          this.x += this.velocityX;
+          this.y += this.velocityY;
+          this.alpha -= 0.02;
+        }
+      }
+
+      function createFirework(x, y) {
+        const colors = ["#ff416c", "#ff4b2b", "#ffe082", "#6a11cb", "#2575fc"];
+        for (let i = 0; i < 50; i++) {
+          particles.push(
+            new Particle(
+              x,
+              y,
+              colors[Math.floor(Math.random() * colors.length)]
+            )
+          );
+        }
+      }
+
+      function randomPosition() {
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+        };
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((particle, index) => {
+          particle.update();
+          particle.draw();
+          if (particle.alpha <= 0) {
+            particles.splice(index, 1);
+          }
+        });
+        requestAnimationFrame(animate);
+      }
+
+      const clickSound = new Audio("sounds/ti.mp3");
+
+      document.getElementById("revealButton").addEventListener("click", () => {
+        if (!soundPlayed) {
+          clickSound.play();
+          soundPlayed = true;
+        }
+
+        // Change background image on every click
+        document.body.style.backgroundImage = backgrounds[bgIndex]; // Set background image
+        document.body.style.backgroundSize = "cover";
+        document.body.style.backgroundPosition = "center";
+        bgIndex = bgIndex + 1; // Cycle through the images
+
+        for (let i = 0; i < 5; i++) {
+          const position = randomPosition();
+          createFirework(position.x, position.y);
+        }
+
+        const message = document.getElementById("message");
+        if (clickCount < messages.length) {
+          message.textContent = messages[clickCount];
+          clickCount++;
+        } else {
+          document.getElementById("revealButton").style.display = "none";
+          message.style.display = "none";
+
+          const finalImage = document.getElementById("finalImage");
+          const finalMessage = document.getElementById("finalMessage");
+          const finalImg = document.getElementById("finalImg");
+
+          finalImg.onload = () => {
+            finalImage.style.display = "flex";
+            finalImage.querySelector("img").style.transform = "scale(1)";
+            setTimeout(() => {
+              finalImage.style.opacity = 1;
+            }, 500);
+
+            setTimeout(() => {
+              finalMessage.style.display = "block";
+              finalMessage.style.opacity = 1;
+            }, 1500);
+          };
+
+          if (finalImg.complete) {
+            finalImg.onload();
+          }
+        }
+      });
+
+      animate();
+    </script>
+  </body>
+</html>
